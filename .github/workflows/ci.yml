@@ -1,0 +1,34 @@
+name: "build"
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+jobs:
+  main:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Checkout submodule
+        uses: actions/checkout@v2
+        with:
+          path: libtommath
+          ref: v1.2.0
+          repository: libtom/libtommath
+          submodules: true
+      - name: Install Clang + LLVM
+        run: sudo apt-get install clang-10 llvm-10
+      - name: Install WASI Libc
+        run: |
+          git clone https://github.com/WebAssembly/wasi-libc /tmp/wasi-libc
+          sudo mv /tmp/wasi-libc /opt
+          pushd /opt/wasi-libc
+          make WASM_CC=clang-10 WASM_AR=llvm-ar-10 WASM_NM=llvm-nm-10
+          popd
+      - name: "Make"
+        run: make
+      - uses: actions/upload-artifact@v2
+        with:
+          name: libtommath-v1.2.0.tar.gz
+          path: build/libtommath-v1.2.0.tar.gz

@@ -1,0 +1,4 @@
+[submodule "libtommath"]
+	path = libtommath
+	url = https://github.com/libtom/libtommath
+	branch = v1.2.0
